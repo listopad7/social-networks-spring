@@ -10,10 +10,11 @@ public class LouvainService {
 
 	WeightedGraph g;
 
-	Lo
 
 	public List<LouvainResult> getCommunityDetectionResults() {
 		List<LouvainResult> result = new ArrayList<>();
+		Louvain firstLouvain =new Louvain(g);
+
 
 	}
 }
