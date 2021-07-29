@@ -3,7 +3,6 @@ package hu.listopad.socialnetworksspring.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,14 +15,15 @@ public class  Louvain {
 	private Map<Integer,Integer> degrees; // stores the degree of each vertex in the graph
 	protected ArrayList<Group> groups; // stores sub-communities
 	private final Double MODULARITY_AT_START; //modularity of the groups before Louvain optimization
-	private Map<Integer, Group> vertexGroupMap; //store for each vertex which group it belongs to, to make calculations faster
+	protected Map<Integer, Group> vertexGroupMap; //store for each vertex which group it belongs to, to make calculations faster
 	
 	public Louvain(WeightedGraph graph) {
 		g = graph;
+		vertexGroupMap = new HashMap<>();
 		degrees = calculateDegrees();
 		groups = createGroups();
 		MODULARITY_AT_START =modularityAtStart();
-		vertexGroupMap = new HashMap<>();
+
 	}
 	
 	// calculate degree of each vertex and put them in hash map
@@ -54,7 +54,7 @@ public class  Louvain {
 			if (g.getWgMap().get(i).containsKey(i)){  //check for self loops, as these are the only edges inside groups
 				m=g.getWgMap().get(i).get(i);
 			}
-			Double mm = (m-(Double.valueOf(degrees.get(i))*Double.valueOf(degrees.get(i)))/(tw))/(tw);
+			double mm = (m-(Double.valueOf(degrees.get(i))*Double.valueOf(degrees.get(i)))/(tw))/(tw);
 			mod = mod + mm;
 			
 		}
@@ -77,13 +77,13 @@ public class  Louvain {
 	// before Louvain calculation this gives the same value as modularityAtStart
 	// after rearranging groups it calculates the new, improved modularity
 	public Double modularity() {
-		Double mod = 0.0;
+		double mod = 0.0;
 		int tw = g.getTotalWeight();
 		for (Group gr : groups) {     // for each group in the graph
 			for (int i : gr.getNodes()) {    // find edge weights inside the group and calculate modularity for them
 				for (int j: gr.getNodes()) {
 					int m = g.getWgMap().get(i).getOrDefault(j, 0);
-					Double mm = (m-(Double.valueOf(degrees.get(i))*Double.valueOf(degrees.get(j)))/(tw))/(tw);
+					double mm = (m-(Double.valueOf(degrees.get(i))*Double.valueOf(degrees.get(j)))/(tw))/(tw);
 					mod =mod + mm;
 				}
 			}
@@ -92,7 +92,7 @@ public class  Louvain {
 	}
 	
 	// performs one pass of Louvain calculation
-	private WeightedGraph louvainOptimization() {
+	 WeightedGraph louvainOptimization() {
 		int moved = 1;
 		while (moved > 0) {    // while loop performs first phase of louvain calculation
 			moved = 0;
@@ -105,43 +105,7 @@ public class  Louvain {
 		return createNewGraphFromGroups();
 	}
 	
-	// performsLouvain modularity optimization until no gain in modularity can be achieved
-	// in the resulting array list data from all passes are gathered
-	// every pass requires a new Louvain object
-	public List<LouvainResult> louvainModularity() {
-		List<LouvainResult> result = new ArrayList<>();
-		Double mod1 = MODULARITY_AT_START;	
-		WeightedGraph nwg = louvainOptimization();  // first pass of Louvain calculation
-		Double mod2 = modularity();
-		int numOfRounds = 0;
-		while (mod2 > mod1) {
-			Louvain nextRound = new Louvain(nwg);
-			mod1 = nextRound.MODULARITY_AT_START;
-			if (numOfRounds == 0) {       // add results of first pass to the results
-				ArrayList<HashSet<Integer>> communities = new ArrayList<>();
-				for (int i =0; i < groups.size(); i++) {
-					HashSet<Integer> nodes = groups.get(i).getNodes();
-					communities.add(nodes);
-				}
-				LouvainResult res = new LouvainResult(g, communities, mod1);
-				result.add(numOfRounds, res);
-			}
-			WeightedGraph nnwg = nextRound.louvainOptimization();  // next passes of Louvain calculation
-			mod2 = nextRound.modularity();
-			numOfRounds += 1;
-			if (numOfRounds > 0) {		// add results of all other passes to the results
-				ArrayList<HashSet<Integer>> communities = new ArrayList<>();
-				for (int i=0 ; i < nextRound.groups.size(); i++) {
-					HashSet<Integer> nodes = nextRound.groups.get(i).getNodes();
-					communities.add(nodes);
-				}
-				LouvainResult res = new LouvainResult(nwg, communities, mod2);
-				result.add(numOfRounds, res);
-			}
-			nwg = nnwg; // the result of this pass will be the basis for new calculation
-		}
-		return result;		
-	}
+
 	
 	
 	// helper method to create new graph from communities created in phase 1 of Louvain calculations
@@ -151,7 +115,7 @@ public class  Louvain {
 		WeightedGraph nwg = new WeightedGraph();
 		for (Group gr : groups) {             // for each group not empty , add a new vertex
 			if (!gr.getNodes().isEmpty()) {
-				nwg.addVertex(groups.indexOf(gr));
+				nwg.addVertex(gr.getId());
 			}
 		}
 		for (Group gr : groups) {
@@ -160,13 +124,13 @@ public class  Louvain {
 				HashMap<Integer, Integer> edges = new HashMap<>();   //edge weight values are stored in a HashMap. Keys are groups ( or vertices in the new graph)
 				for (Integer i : members) {                         // calculate edge weights for all neighbouring groups
 					for (Integer j : g.getWgMap().get(i).keySet()) {
-						Group jGroup = vertexGroupMap.get(j);             // can do this because group ids are equal to the groups' index in groups arraylist
-						edges.merge(jGroup.getId(), g.getWgMap().get(i).get(j), (m, n) -> m+n);
+						Group jGroup = vertexGroupMap.get(j);
+						edges.merge(jGroup.getId(), g.getWgMap().get(i).get(j), Integer::sum);
 					}
 				}
 
 				for (Integer i : edges.keySet()) {
-					nwg.addEdge(groups.indexOf(gr), i, edges.get(i)); // add edges to the graphs with the calculated edge weights
+					nwg.addEdge(gr.getId(), i, edges.get(i)); // add edges to the graphs with the calculated edge weights
 				}
 			}
 		}
@@ -179,9 +143,10 @@ public class  Louvain {
 	// returns true if the node changes its community, and false otherwise
 	protected boolean moveNode(int i) {
 		Set<Group> neighbourGroups = new HashSet<>();
-		Group toGroup = null;
-		Double maxModChange = -1.0;
-		Group gr = vertexGroupMap.get(i);   // find group of i, and remove it from there
+
+		double maxModChange = -1.0;
+		Group gr = vertexGroupMap.get(i);
+		Group toGroup = gr;// find group of i, and remove it from there
 		neighbourGroups.add(gr);
 		gr.removeNode(i);
 		for (int j : g.getWgMap().get(i).keySet()){  // find neighbours of i, and their communities, and put them to neighbour groups
@@ -189,18 +154,17 @@ public class  Louvain {
 		}
 
 		for (Group ngr : neighbourGroups) {
-			Set<Integer> neighbourNodes = new HashSet(ngr.getNodes());
+			Set<Integer> neighbourNodes = new HashSet<>(ngr.getNodes());
 			neighbourNodes.retainAll(g.getWgMap().get(i).keySet());    //retain in the set only those nodes, which are neighbours of i.
-			Double modChange = 0.0;
 			int numToEdges = 0;
 			for (int k : neighbourNodes) {
 				numToEdges += g.getWgMap().get(i).get(k);      // count the edge wights from i to group k
 			}
 				Double degree = Double.valueOf(degrees.get(i));
-				Double numInEdges = (double) ngr.getNumInEdges();
-				Double totalWeight = (double) g.getTotalWeight();
-				Double numAllEdges = (double) ngr.getNumAllEdges();
-				modChange = (numInEdges+numToEdges)/(2*totalWeight)-((numAllEdges+degree)/(2*totalWeight))*((numAllEdges+degree)/(2*totalWeight))-(numInEdges/(2*totalWeight)-(numAllEdges/(2*totalWeight))*(numAllEdges/(2*totalWeight))-(degree/(2*totalWeight))*(degree/(2*totalWeight)));
+				double numInEdges = ngr.getNumInEdges();
+				double totalWeight = g.getTotalWeight();
+				double numAllEdges = ngr.getNumAllEdges();
+				double modChange = (numInEdges+numToEdges)/(2*totalWeight)-((numAllEdges+degree)/(2*totalWeight))*((numAllEdges+degree)/(2*totalWeight))-(numInEdges/(2*totalWeight)-(numAllEdges/(2*totalWeight))*(numAllEdges/(2*totalWeight))-(degree/(2*totalWeight))*(degree/(2*totalWeight)));
 				if (modChange > maxModChange) {  //keep track of maximum modularity change
 					maxModChange = modChange;
 					toGroup = ngr;   // keep track of group with maximum modularity change
@@ -216,48 +180,7 @@ public class  Louvain {
 		}
 	}
 	
-	// create CapGraphs from communities obtained
-	// so on these graphs, dominating set search can be performed
-	// goal is to find out which nodes from the original graph belong to communities found in the last pass
-	// for this we have to iterate over results get at all passes
-	public ArrayList<UnweightedGraph> createCapGraphsFromCommunities(List<LouvainResult> res){
-		ArrayList<UnweightedGraph> cgList = new ArrayList<>();  //new arrayList to store resulting graphs
-		int size = res.size();
-		ArrayList<HashSet<Integer>> comm = res.get(res.size()-1).getCommunities();
-		for (int i=0; i<comm.size(); i++) {    // iterate over communities found 
-			HashSet<Integer> firstNodes = comm.get(i);
-			int counter = size-1;   // keep track of number of Louvain passes
-			while (counter > 0) {   // iterate over results found at different passes
-				ArrayList<HashSet<Integer>> comm2 = res.get(counter-1).getCommunities();
-				ArrayList<HashSet<Integer>> comm3 = new ArrayList<HashSet<Integer>>();
-				HashSet<Integer> nextNodes = new HashSet<Integer>();
-				for (int j : firstNodes) {
-					comm3.add(comm2.get(j));
-				}
-				for (int k=0; k<comm3.size(); k++) {
-					for (int l : comm3.get(k)) {
-						nextNodes.add(l);
-					}
-				}
-				firstNodes = nextNodes;
-				counter -=1;
-				
-			}
-			UnweightedGraph cg = new UnweightedGraph();    // add a node in the new graph for each element in the set
-			for (Integer m : firstNodes) {
-				cg.addVertex(m);
-			}
-			for (Integer m : firstNodes) {   // edges are added based on edges of the original graph
-				HashSet<Pair<Integer,Integer>> neighbors = g.getWgMap().get(m);
-				for (Pair<Integer,Integer> p : neighbors) {
-					cg.addEdge(m,p.getKey());
-				}
-			}
-			cgList.add(cg);
-		}
-		return cgList;
-	}
-	
+
 	public Double getModularityAtStart() {
 		return MODULARITY_AT_START;
 	}

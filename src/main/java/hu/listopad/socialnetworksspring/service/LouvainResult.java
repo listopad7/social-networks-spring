@@ -2,6 +2,7 @@ package hu.listopad.socialnetworksspring.service;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
 
 
 // class to store results of a Louvain pass
@@ -9,11 +10,11 @@ public class  LouvainResult {
 	
 	private Double modularityAtStart;
 	private Double modularityAtEnd;
-	private ArrayList<HashSet<Integer>> communities;
+	private Map<Integer,HashSet<Integer>> communities;
 	private WeightedGraph g;
 	
 	
-	public LouvainResult(WeightedGraph graph, ArrayList<HashSet<Integer>> comm, Double mod1, Double mod2) {
+	public LouvainResult(WeightedGraph graph, Map<Integer, HashSet<Integer>> comm, Double mod1, Double mod2) {
 		g = graph;
 		communities = comm;
 		modularityAtStart = mod1;
@@ -28,12 +29,21 @@ public class  LouvainResult {
 		return modularityAtEnd;
 	}
 
-	public ArrayList<HashSet<Integer>> getCommunities(){
+	public Map<Integer, HashSet<Integer>> getCommunities(){
 		return communities;
 	}
 	
 	public WeightedGraph getGraph() {
 		return g;
+	}
+
+	@Override
+	public String toString() {
+		return "LouvainResult{" +
+				"modularityAtStart=" + modularityAtStart +
+				", modularityAtEnd=" + modularityAtEnd +
+				", communities=" + communities +
+				'}';
 	}
 }
 

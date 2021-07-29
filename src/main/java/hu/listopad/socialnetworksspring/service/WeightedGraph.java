@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import util.GraphLoader;
 import java.util.Collections;
 import java.util.ArrayList;
 
@@ -38,9 +37,9 @@ public class  WeightedGraph implements Graph{
 		if(wgMap.containsKey(from) && (wgMap.containsKey(to))) {
 			(wgMap.get(from)).put(to, weight);
 			numEdges +=1;
-			if (!wgMap.get(to).keySet().contains(from)) {
+			//if (!wgMap.get(to).keySet().contains(from)) {
 				totalWeight = totalWeight + weight;
-			}
+			//}
 		}
 	}
 	// creates an edge with weight 1
@@ -49,9 +48,9 @@ public class  WeightedGraph implements Graph{
 		if(wgMap.containsKey(from) && (wgMap.containsKey(to))) {
 			(wgMap.get(from)).put(to, 1);
 			numEdges +=1;
-			if (!wgMap.get(to).keySet().contains(from)) {
+			//if (!wgMap.get(to).keySet().contains(from)) {
 				totalWeight = totalWeight += 1;
-			}
+			//}
 		}
 	}
 	
@@ -89,9 +88,49 @@ public class  WeightedGraph implements Graph{
 	
 	public static void main (String[] args) {
 		WeightedGraph smallGraph = new WeightedGraph();
-		GraphLoader.loadGraph(smallGraph, "data/facebook_2000.txt");
-		Louvain smCalc = new Louvain(smallGraph);
-		Louvain smCalc2 = new LouvainPrune(smallGraph);
+		GraphLoader.loadGraph(smallGraph, "c:/Users/Daniel/repos/social-networks-spring/data/smallcircle.txt");
+		LouvainService smCalc = new LouvainService(smallGraph);
+		for (LouvainResult ls : smCalc.getCommunityDetectionResults()){
+			System.out.println(ls);
+		}
+
+
+		/*WeightedGraph crclks = new WeightedGraph();
+		for (int i = 0 ; i < 150; i++) {
+			crclks.addVertex(i);
+		}
+		for (int i=0; i<146; i=i+5) {
+			for (int j=i+1; j<i+5; j++) {
+				crclks.addEdge(i, j);
+				crclks.addEdge(j, i);
+				for (int k=j+1; k<i+5; k++) {
+					crclks.addEdge(j, k);
+					crclks.addEdge(k, j);
+				}
+			}
+			int l = i+3;
+			int m = i+4;
+			crclks.addEdge(l, m);
+			crclks.addEdge(m, l);
+			if (i<142) {
+				crclks.addEdge(m, i+5);
+				crclks.addEdge(i+5, m);
+			}
+			else {
+				crclks.addEdge(m, 0);
+				crclks.addEdge(0, m);
+			}
+		}
+
+		LouvainService circle = new LouvainService(crclks);
+		for (LouvainResult ls : circle.getCommunityDetectionResults()){
+			System.out.println(ls);
+		}*/
+
+
+
+
+		/*Louvain smCalc2 = new LouvainPrune(smallGraph);
 		long startTime1 = System.nanoTime();
 		List<LouvainResult> res =smCalc.louvainModularity();
 		long endTime1 = System.nanoTime();
@@ -131,7 +170,7 @@ public class  WeightedGraph implements Graph{
 			System.out.print(" " + i + ",");
 			}
 		System.out.println(" ");
-		System.out.println("Dominating set for the last community: " +domSet2);
+		System.out.println("Dominating set for the last community: " +domSet2);*/
 		
 // This section uses the UCSD Facebook data
 // It takes around 2 hours to run
