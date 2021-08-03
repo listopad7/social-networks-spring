@@ -1,6 +1,9 @@
 package hu.listopad.socialnetworksspring.service;
 
 
+import org.springframework.stereotype.Component;
+
+import java.sql.SQLOutput;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -8,6 +11,7 @@ import java.util.Map;
 import java.util.Collections;
 import java.util.ArrayList;
 
+@Component
 public class  WeightedGraph implements Graph{
 	
 	private HashMap<Integer, HashMap<Integer,Integer>> wgMap;
@@ -88,14 +92,15 @@ public class  WeightedGraph implements Graph{
 	
 	public static void main (String[] args) {
 		WeightedGraph smallGraph = new WeightedGraph();
-		GraphLoader.loadGraph(smallGraph, "c:/Users/Daniel/repos/social-networks-spring/data/smallcircle.txt");
+		GraphLoader.loadGraph(smallGraph, "c:/Users/Daniel/repos/social-networks-spring/data/facebook_ucsd.txt");
 		LouvainService smCalc = new LouvainService(smallGraph);
 		for (LouvainResult ls : smCalc.getCommunityDetectionResults()){
 			System.out.println(ls);
 		}
+		System.out.println("");
 
 
-		/*WeightedGraph crclks = new WeightedGraph();
+		WeightedGraph crclks = new WeightedGraph();
 		for (int i = 0 ; i < 150; i++) {
 			crclks.addVertex(i);
 		}
@@ -125,7 +130,7 @@ public class  WeightedGraph implements Graph{
 		LouvainService circle = new LouvainService(crclks);
 		for (LouvainResult ls : circle.getCommunityDetectionResults()){
 			System.out.println(ls);
-		}*/
+		}
 
 
 

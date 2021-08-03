@@ -67,7 +67,7 @@ public class Group {
 			Map<Boolean, Integer> numEdges = neighbors.entrySet().stream()
 					.collect(Collectors.partitioningBy(e ->nodes.contains(e.getKey()),
 							Collectors.reducing(0, e -> e.getValue(), (u, v) -> u+v )));
-			numInEdges += numEdges.get(true);
+			numInEdges += numEdges.get(true)*2;
 			numAllEdges += (numEdges.get(true) + numEdges.get(false));
 		}
 	}
@@ -79,7 +79,7 @@ public class Group {
 			Map<Boolean, Integer> numEdges = neighbors.entrySet().stream()
 					.collect(Collectors.partitioningBy(e ->nodes.contains(e.getKey()),
 							Collectors.reducing(0, e -> e.getValue(), (u, v) -> u+v )));
-			numInEdges -= numEdges.get(true);
+			numInEdges -= numEdges.get(true)*2;
 			numAllEdges -= (numEdges.get(true) + numEdges.get(false));
 			nodes.remove(n);
 		}

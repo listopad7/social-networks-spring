@@ -34,16 +34,7 @@ public class LouvainService implements CommunityDetectionService{
 			mod1 = louvain.getModularityAtStart();
 			WeightedGraph nwg = louvain.louvainOptimization();
 			mod2 = louvain.modularity();
-			/*if (mod2>mod1){
-				Map<Integer, HashSet<Integer>> groupsAndNodes = louvain.getGroups().stream().filter(gr -> !gr.getNodes().isEmpty()).collect(Collectors.toMap(Group::getId, Group::getNodes));
-				LouvainResult louvainResult = new LouvainResult(graphToUse, groupsAndNodes, mod1, mod2);
-				result.add(louvainResult);
-				graphToUse = nwg;
-			}
-			else {
-				LouvainResult louvainResult = new LouvainResult(graphToUse, new HashMap<>(), mod1, mod2);
-				result.add(louvainResult);
-			}*/
+
 			Map<Integer, HashSet<Integer>> groupsAndNodes = louvain.getGroups().stream().filter(gr -> !gr.getNodes().isEmpty()).collect(Collectors.toMap(Group::getId, Group::getNodes));
 			LouvainResult louvainResult = new LouvainResult(graphToUse, groupsAndNodes, mod1, mod2);
 			result.add(louvainResult);

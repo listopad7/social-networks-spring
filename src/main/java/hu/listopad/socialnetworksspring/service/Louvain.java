@@ -196,6 +196,8 @@ public class  Louvain {
 	public Map<Integer,Integer> getDegrees(){
 		return degrees;
 	}
-	
-	
+
+	public Map<Integer, Group> getVertexGroupMap() {
+		return vertexGroupMap;
+	}
 }
