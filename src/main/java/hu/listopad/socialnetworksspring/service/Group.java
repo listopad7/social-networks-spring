@@ -1,13 +1,11 @@
 package hu.listopad.socialnetworksspring.service;
 
-import lombok.Getter;
 
-import java.util.Collections;
+
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.*;
 import java.util.stream.*;
 
 
@@ -54,16 +52,7 @@ public class Group {
 		if (!nodes.contains(n)) {
 			nodes.add(n);
 			HashMap<Integer,Integer> neighbors = g.getWgMap().get(n);
-			/*Integer d = 0;
-			Integer in = 0;
-			for (Pair<Integer,Integer> p : neighbors) {
-				d = d + p.getValue();
-				if (nodes.contains(p.getKey())) {
-					in = in + p.getValue();
-				}
-			}
-			numAllEdges = numAllEdges + d;
-			numInEdges = numInEdges + in;*/
+			
 			Map<Boolean, Integer> numEdges = neighbors.entrySet().stream()
 					.collect(Collectors.partitioningBy(e ->nodes.contains(e.getKey()),
 							Collectors.reducing(0, e -> e.getValue(), (u, v) -> u+v )));

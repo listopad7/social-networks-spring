@@ -3,13 +3,10 @@ package hu.listopad.socialnetworksspring.service;
 
 import org.springframework.stereotype.Component;
 
-import java.sql.SQLOutput;
+
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Collections;
-import java.util.ArrayList;
+
 
 @Component
 public class  WeightedGraph implements Graph{
@@ -97,8 +94,8 @@ public class  WeightedGraph implements Graph{
 		for (LouvainResult ls : smCalc.getCommunityDetectionResults()){
 			System.out.println(ls);
 		}
+		
 		System.out.println("");
-
 
 		WeightedGraph crclks = new WeightedGraph();
 		for (int i = 0 ; i < 150; i++) {

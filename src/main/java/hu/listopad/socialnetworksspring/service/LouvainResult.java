@@ -1,6 +1,6 @@
 package hu.listopad.socialnetworksspring.service;
 
-import java.util.ArrayList;
+
 import java.util.HashSet;
 import java.util.Map;
 

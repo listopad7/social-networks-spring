@@ -16,7 +16,8 @@ public class LouvainPrune extends Louvain {
 	
 
 	// performs one pass of Louvain prune calculation
-	private WeightedGraph louvainPruneOptimization() {
+	@Override
+	WeightedGraph louvainOptimization() {
 		List<Integer> nodeList = new LinkedList<>(g.getWgMap().keySet());  //queue to keep nodes waiting for modularity change calculation
 		while (!nodeList.isEmpty()) {
 		Integer i = nodeList.remove(0);

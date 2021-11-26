@@ -1,7 +1,6 @@
 package hu.listopad.socialnetworksspring.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,11 @@ public class LouvainService implements CommunityDetectionService{
 			WeightedGraph nwg = louvain.louvainOptimization();
 			mod2 = louvain.modularity();
 
-			Map<Integer, HashSet<Integer>> groupsAndNodes = louvain.getGroups().stream().filter(gr -> !gr.getNodes().isEmpty()).collect(Collectors.toMap(Group::getId, Group::getNodes));
+			Map<Integer, HashSet<Integer>> groupsAndNodes = louvain.
+															getGroups().
+															stream().
+															filter(gr -> !gr.getNodes().isEmpty()).
+															collect(Collectors.toMap(Group::getId, Group::getNodes));
 			LouvainResult louvainResult = new LouvainResult(graphToUse, groupsAndNodes, mod1, mod2);
 			result.add(louvainResult);
 			graphToUse = nwg;
