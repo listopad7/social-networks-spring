@@ -25,9 +25,9 @@ public class DynamoDbConfig {
     }
 
     @Bean
-    public DynamoDbEnhancedClient getDynamoDbEnhancedClient(){
+    public DynamoDbEnhancedClient getDynamoDbEnhancedClient(DynamoDbClient dynamoDbClient){
         return DynamoDbEnhancedClient.builder()
-                .dynamoDbClient(getDynamoDbClient())
+                .dynamoDbClient(dynamoDbClient)
                 .build();
     }
 }

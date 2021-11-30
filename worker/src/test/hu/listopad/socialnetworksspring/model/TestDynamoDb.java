@@ -1,18 +1,13 @@
-package hu.model;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+package hu.listopad.socialnetworksspring.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import hu.listopad.socialnetworksspring.SocialNetworksSpringApplication;
-import hu.listopad.socialnetworksspring.model.CommunityDetectionResult;
-import hu.listopad.socialnetworksspring.model.ResultRepository;
-import hu.listopad.socialnetworksspring.model.Status;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest(classes= SocialNetworksSpringApplication.class)
+@SpringBootTest
 public class TestDynamoDb {
 
     @Autowired
