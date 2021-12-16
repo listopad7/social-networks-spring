@@ -1,10 +1,7 @@
 package hu.listopad.socialnetworksspring.controller;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import software.amazon.awssdk.services.sqs.SqsClientBuilder;
 import software.amazon.awssdk.services.sqs.model.*;
 import software.amazon.awssdk.services.sqs.SqsClient;
@@ -24,6 +21,17 @@ public class CommunityDetectionController {
     @GetMapping("/graphs")
     public String index(){
         return "tadááámmmm";
+    }
+
+
+    @GetMapping("/${graphName}")
+    public String getOneResult(){
+        return "One result";
+    }
+
+    @DeleteMapping("/${graphName}")
+    public String deleteGraph(){
+        return "success";
     }
 
 
