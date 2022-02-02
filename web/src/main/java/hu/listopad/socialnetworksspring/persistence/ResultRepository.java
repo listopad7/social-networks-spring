@@ -1,6 +1,7 @@
 package hu.listopad.socialnetworksspring.persistence;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
@@ -19,8 +20,15 @@ import java.util.List;
 @Repository
 public class ResultRepository{
 
-    @Autowired
     private DynamoDbEnhancedClient dynamoDbEnhancedClient;
+
+    @Value("${amazon.dynamodb.tablename}")
+    private String tableName;
+
+    @Autowired
+    public ResultRepository(DynamoDbEnhancedClient dynamoDbEnhancedClient){
+        this.dynamoDbEnhancedClient = dynamoDbEnhancedClient;
+    }
 
 
 
@@ -42,7 +50,7 @@ public class ResultRepository{
         List<CommunityDetectionResult> queryResult = new ArrayList<>();
 
         try {
-            DynamoDbTable<CommunityDetectionResult> resultTable = dynamoDbEnhancedClient.table("result_table", TableSchema.fromBean(CommunityDetectionResult.class));
+            DynamoDbTable<CommunityDetectionResult> resultTable = dynamoDbEnhancedClient.table(tableName, TableSchema.fromBean(CommunityDetectionResult.class));
 
 
             // Create a QueryConditional object that is used in the query operation.
@@ -60,7 +68,6 @@ public class ResultRepository{
             }
 
         } catch (DynamoDbException e) {
-            //TODO implement this
             System.err.println(e.getMessage());
         }
 
@@ -84,7 +91,7 @@ public class ResultRepository{
     }                        
 
     private DynamoDbTable<CommunityDetectionResult> getTable(){
-        return dynamoDbEnhancedClient.table("result_table", TableSchema.fromBean(CommunityDetectionResult.class));
+        return dynamoDbEnhancedClient.table(tableName, TableSchema.fromBean(CommunityDetectionResult.class));
     }
 
     

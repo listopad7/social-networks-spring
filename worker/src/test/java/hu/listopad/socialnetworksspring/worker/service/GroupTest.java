@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Created by Noemi Czuczy on 2021. 07. 29.
  */
-class GroupTest {
+public class GroupTest {
 
 	WeightedGraph g1;
 	Group gr1;

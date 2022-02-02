@@ -1,6 +1,7 @@
 package hu.listopad.socialnetworksspring.persistence;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,6 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortK
 
 /**
  * Created by Noemi Czuczy on 2021. 08. 06.
- * DAO
  */
 @DynamoDbBean
 @Component
@@ -42,7 +42,7 @@ public class CommunityDetectionResult {
 		this.graphName = graphName;
 	}
 
-	@DynamoDbAttribute("status")
+	@DynamoDbAttribute("Status")
 	public Status getStatus() {
 		return status;
 	}
@@ -62,10 +62,19 @@ public class CommunityDetectionResult {
 		this.resultList = resultList;
 
 	}
-	
-	
-	
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		CommunityDetectionResult that = (CommunityDetectionResult) o;
+		return userId.equals(that.userId) && graphName.equals(that.graphName) && status == that.status && Objects.equals(resultList, that.resultList);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(userId, graphName, status, resultList);
+	}
 }
 
 

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Created by Noemi Czuczy on 2021. 07. 30.
  */
-class LouvainTest {
+public class LouvainTest {
 
 	WeightedGraph g = new WeightedGraph();
 	Louvain louvain;

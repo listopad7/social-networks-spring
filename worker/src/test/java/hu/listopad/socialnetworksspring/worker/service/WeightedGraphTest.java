@@ -9,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Created by Noemi Czuczy on 2021. 07. 29.
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class WeightedGraphTest {
+
+public class WeightedGraphTest {
 
 	static WeightedGraph weightedGraph;
 

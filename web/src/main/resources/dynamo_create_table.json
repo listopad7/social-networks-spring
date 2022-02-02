@@ -1,0 +1,15 @@
+{
+    "TableName": "result_table",
+    "KeySchema": [
+      { "AttributeName": "UserId", "KeyType": "HASH" },
+      { "AttributeName": "GraphName", "KeyType": "RANGE" }
+    ],
+    "AttributeDefinitions": [
+      { "AttributeName": "UserId", "AttributeType": "S" },
+      { "AttributeName": "GraphName", "AttributeType": "S" }
+    ],
+    "ProvisionedThroughput": {
+      "ReadCapacityUnits": 5,
+      "WriteCapacityUnits": 5
+    }
+}
