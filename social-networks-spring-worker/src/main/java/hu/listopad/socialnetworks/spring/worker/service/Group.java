@@ -2,10 +2,9 @@ package hu.listopad.socialnetworks.spring.worker.service;
 
 
 
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import hu.listopad.socialnetworks.spring.data.WeightedGraph;
+
+import java.util.*;
 import java.util.stream.*;
 
 
@@ -18,7 +17,7 @@ public class Group {
 
 	private final int id;
 	private final WeightedGraph g;
-	private final HashSet<Integer> nodes;
+	private final List<Integer> nodes;
 	private int numInEdges;  //number of edges inside the group
 	private int numAllEdges; //number of all edges incident to vertices in the group
 	
@@ -26,7 +25,7 @@ public class Group {
 
 		this.id = id;
 		g = graph;
-		nodes = new HashSet<>();
+		nodes = new ArrayList<>();
 		numInEdges = 0;
 		numAllEdges = 0;
 	}
@@ -39,7 +38,7 @@ public class Group {
 		return numAllEdges;
 	}
 	
-	public HashSet<Integer> getNodes() {
+	public List<Integer> getNodes() {
 		return nodes;
 	}
 
@@ -51,7 +50,7 @@ public class Group {
 	public void addNode(int n) {
 		if (!nodes.contains(n)) {
 			nodes.add(n);
-			HashMap<Integer,Integer> neighbors = g.getWgMap().get(n);
+			Map<Integer,Integer> neighbors = g.getWgMap().get(n);
 			
 			Map<Boolean, Integer> numEdges = neighbors.entrySet().stream()
 					.collect(Collectors.partitioningBy(e ->nodes.contains(e.getKey()),
@@ -64,13 +63,13 @@ public class Group {
 	
 	public void removeNode(int n) {
 		if (nodes.contains(n)) {
-			HashMap<Integer,Integer> neighbors = g.getWgMap().get(n);
+			Map<Integer,Integer> neighbors = g.getWgMap().get(n);
 			Map<Boolean, Integer> numEdges = neighbors.entrySet().stream()
 					.collect(Collectors.partitioningBy(e ->nodes.contains(e.getKey()),
 							Collectors.reducing(0, e -> e.getValue(), (u, v) -> u+v )));
 			numInEdges -= numEdges.get(true)*2;
 			numAllEdges -= (numEdges.get(true) + numEdges.get(false));
-			nodes.remove(n);
+			nodes.remove(Integer.valueOf(n));
 		}
 		
 	}

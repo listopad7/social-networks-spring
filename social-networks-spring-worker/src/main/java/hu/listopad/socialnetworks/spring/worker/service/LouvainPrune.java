@@ -1,5 +1,7 @@
 package hu.listopad.socialnetworks.spring.worker.service;
 
+import hu.listopad.socialnetworks.spring.data.WeightedGraph;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

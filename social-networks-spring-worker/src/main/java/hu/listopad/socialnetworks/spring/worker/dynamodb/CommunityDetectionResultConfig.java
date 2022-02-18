@@ -1,7 +1,7 @@
 package hu.listopad.socialnetworks.spring.worker.dynamodb;
 
-import hu.listopad.socialnetworks.spring.dynamo.CommunityDetectionResult;
 
+import hu.listopad.socialnetworks.spring.data.communitydetection.CommunityDetectionResult;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;

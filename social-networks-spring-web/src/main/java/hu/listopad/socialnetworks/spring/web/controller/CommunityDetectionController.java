@@ -1,64 +1,65 @@
 package hu.listopad.socialnetworks.spring.web.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import hu.listopad.socialnetworks.spring.data.communitydetection.SlimCommunityDetectionResult;
+import hu.listopad.socialnetworks.spring.data.communitydetection.CommunityDetectionResult;
+import hu.listopad.socialnetworks.spring.data.communitydetection.Status;
+import hu.listopad.socialnetworks.spring.data.dynamo.ResultRepository;
+import hu.listopad.socialnetworks.spring.data.mapstruct.mappers.MapStructMapperDynamo;
 import hu.listopad.socialnetworks.spring.web.messageing.SendGraphDataMessage;
-import hu.listopad.socialnetworks.spring.web.mapstruct.dtos.CommunityDetectionResultDTO;
-import hu.listopad.socialnetworks.spring.web.mapstruct.mappers.MapStructMapper;
-import hu.listopad.socialnetworks.spring.dynamo.ResultRepository;
-import hu.listopad.socialnetworks.spring.dynamo.Status;
+import hu.listopad.socialnetworks.spring.web.responseData.CommunityDetectionResponse;
+import hu.listopad.socialnetworks.spring.web.responseData.CommunityDetectionToResponseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+
+
+import java.util.NoSuchElementException;
 
 @RestController
 public class CommunityDetectionController {
 
     private final ResultRepository resultRepository;
     private final SendGraphDataMessage sendGraphDataMessage;
-    private final MapStructMapper mapStructMapper;
+    private final MapStructMapperDynamo mapStructMapperDynamo;
+    private final CommunityDetectionToResponseMapper communityDetectionToResponseMapper;
 
     @Autowired
-    public CommunityDetectionController(ResultRepository resultRepository, SendGraphDataMessage sendGraphDataMessage, MapStructMapper mapStructMapper) {
+    public CommunityDetectionController(ResultRepository resultRepository, SendGraphDataMessage sendGraphDataMessage, MapStructMapperDynamo mapStructMapperDynamo, CommunityDetectionToResponseMapper communityDetectionToResponseMapper) {
         this.resultRepository = resultRepository;
         this.sendGraphDataMessage = sendGraphDataMessage;
-        this.mapStructMapper = mapStructMapper;
+        this.mapStructMapperDynamo = mapStructMapperDynamo;
+        this.communityDetectionToResponseMapper = communityDetectionToResponseMapper;
     }
 
 
     @GetMapping("/{userId}/graphs")
-    public ResponseEntity<List<CommunityDetectionResultDTO>> getGraphs(@PathVariable String userId){
+    public ResponseEntity<Iterable<SlimCommunityDetectionResult>> getGraphs(@PathVariable String userId){
 
-        List<CommunityDetectionResultDTO> resultList= mapStructMapper.communityDetectionResultListToDtoList(
-                resultRepository.getCommunityDetectionResultByPartitionKey(userId)
+        Iterable<SlimCommunityDetectionResult> results= mapStructMapperDynamo.communityDetectionResultDynamoListToSlimResultList(
+                resultRepository.findByPrimaryKey(userId)
         );
 
-        return new ResponseEntity<>(resultList, HttpStatus.OK);
+        return new ResponseEntity<>(results, HttpStatus.OK);
 
     }
 
 
     @GetMapping("/{userId}/{graphName}")
-    public ResponseEntity<String> getOneResult(@PathVariable String userId,@PathVariable String graphName){
+    public ResponseEntity<CommunityDetectionResponse> getOneResult(@PathVariable String userId, @PathVariable String graphName){
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        CommunityDetectionResultDTO communityDetectionResultDTO = mapStructMapper.communityDetectionResultToDto(
-                resultRepository.getCommunityDetectionResultByKeys(userId, graphName));
-        try {
-            System.out.println(objectMapper.writeValueAsString(communityDetectionResultDTO));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
 
         try {
-            return new ResponseEntity<>(objectMapper.writeValueAsString(communityDetectionResultDTO), HttpStatus.OK);
-        } catch (JsonProcessingException e) {
-            return new ResponseEntity<>(HttpStatus.valueOf(500));
+            CommunityDetectionResult communityDetectionResult = mapStructMapperDynamo.dynamoToCommunityDetectionResult(
+                resultRepository.findByKeys(userId, graphName).get());
+
+            return new ResponseEntity<>(communityDetectionToResponseMapper.mapToResponse(communityDetectionResult), HttpStatus.OK);
+
+
+        } catch (NoSuchElementException e){
+
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
     }
@@ -75,31 +76,37 @@ public class CommunityDetectionController {
     @DeleteMapping("/{userId}/{graphName}")
     public ResponseEntity<Void> deleteGraph(@PathVariable String userId,@PathVariable String graphName){
 
-        resultRepository.deleteCommunityDetectionResult(userId, graphName);
+        resultRepository.deleteByKeys(userId, graphName);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 
     @PostMapping("/{userId}/{graphName}")
-    public ResponseEntity<Void> newCalculation(@PathVariable String userId, @PathVariable String graphName, @RequestBody String payload){
-        System.out.println(payload);
-        sendGraphDataMessage.sendMessage(userId, graphName, payload);
-
-        String jsonFormattedString = "";
+    public ResponseEntity<String> newCalculation(@PathVariable String userId, @PathVariable String graphName, @RequestBody String payload){
 
 
+        try {
 
-        CommunityDetectionResultDTO communityDetectionResultDTO =
-                new CommunityDetectionResultDTO();
-        communityDetectionResultDTO.setUserId(userId);
-        communityDetectionResultDTO.setGraphName(graphName);
-        communityDetectionResultDTO.setStatus(Status.IN_PROGRESS);
-        communityDetectionResultDTO.setOriginalGraph(payload);
+            sendGraphDataMessage.sendMessage(userId, graphName, payload);
 
-        resultRepository.save(mapStructMapper.dtoToCommunityDetectionResult(communityDetectionResultDTO));
+        } catch (JsonProcessingException e) {
+
+            return new ResponseEntity<>("Invalid Json", HttpStatus.BAD_REQUEST);
+
+        }
+
+        CommunityDetectionResult communityDetectionResult = new CommunityDetectionResult();
+        communityDetectionResult.setUserId(userId);
+        communityDetectionResult.setGraphName(graphName);
+        communityDetectionResult.setStatus(Status.IN_PROGRESS);
+
+
+        resultRepository.save(mapStructMapperDynamo.communityDetectionResultToDynamo(communityDetectionResult));
 
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
+
 
     
 }

@@ -19,7 +19,7 @@
     <modules>
         <module>social-networks-spring-web</module>
         <module>social-networks-spring-worker</module>
-        <module>social-networks-spring-dynamo</module>
+        <module>social-networks-spring-data</module>
     </modules>
 
     <properties>

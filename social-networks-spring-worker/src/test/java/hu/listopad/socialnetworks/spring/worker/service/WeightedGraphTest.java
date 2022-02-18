@@ -1,5 +1,6 @@
 package hu.listopad.socialnetworks.spring.worker.service;
 
+import hu.listopad.socialnetworks.spring.data.WeightedGraph;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

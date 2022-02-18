@@ -1,5 +1,7 @@
 package hu.listopad.socialnetworks.spring.worker.service;
 
+import hu.listopad.socialnetworks.spring.data.GraphLoader;
+import hu.listopad.socialnetworks.spring.data.WeightedGraph;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +19,7 @@ public class LouvainTest {
 	// TODO: change hardcoded value
 	@BeforeEach
 	void setUp(){
-		GraphLoader.loadGraph(g, "c:/Users/noemi/repos/social-networks-spring/data/louvain_sample.txt");
+		GraphLoader.loadGraph(g, "c:/Users/noemi/repos/social-networks-spring/data/text-files/louvain_sample.txt");
 		louvain= new Louvain(g);
 	}
 

@@ -1,5 +1,8 @@
 package hu.listopad.socialnetworks.spring.worker.service;
 
+
+import hu.listopad.socialnetworks.spring.data.WeightedGraph;
+
 import java.util.List;
 
 /**
@@ -7,6 +10,6 @@ import java.util.List;
  */
 public interface CommunityDetectionService {
 
-	List<CommunityDetectionOnePassResult> getCommunityDetectionResults();
+	List<CommunityDetectionOnePassResult> getCommunityDetectionResults(WeightedGraph g);
 
 }

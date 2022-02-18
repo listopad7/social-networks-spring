@@ -1,5 +1,7 @@
 package hu.listopad.socialnetworks.spring.worker.service;
 
+import hu.listopad.socialnetworks.spring.data.GraphLoader;
+import hu.listopad.socialnetworks.spring.data.WeightedGraph;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,10 +21,10 @@ public class GroupTest {
 	@BeforeEach
 	void setUp(){
 		g1 = new WeightedGraph();
-		GraphLoader.loadGraph(g1, "c:/Users/noemi/repos/social-networks-spring/data/smallstar.txt");
+		GraphLoader.loadGraph(g1, "c:/Users/noemi/repos/social-networks-spring/data/text-files/smallstar.txt");
 		gr1 = new Group(g1, 1);
 		g2 = new WeightedGraph();
-		GraphLoader.loadGraph(g2, "c:/Users/noemi/repos/social-networks-spring/data/louvain_sample.txt");
+		GraphLoader.loadGraph(g2, "c:/Users/noemi/repos/social-networks-spring/data/text-files/louvain_sample.txt");
 		gr2 = new Group(g2, 2);
 
 

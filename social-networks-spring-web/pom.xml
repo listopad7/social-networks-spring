@@ -56,12 +56,18 @@
         </dependency>
         <dependency>
             <groupId>hu.listopad</groupId>
-            <artifactId>social-networks-spring-dynamo</artifactId>
+            <artifactId>social-networks-spring-data</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>hu.listopad</groupId>
+            <artifactId>social-networks-spring-dynamo</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

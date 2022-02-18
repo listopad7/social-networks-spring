@@ -24,26 +24,22 @@ public class SendGraphDataMessageSqs implements SendGraphDataMessage {
     }
 
     @Override
-    public void sendMessage(String userId, String graphName, String graph) {
-
-        String messageJson = "";
-
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-
-            JsonNode node = mapper.readTree(graph);
-
-            ObjectNode message = mapper.createObjectNode();
-            message.put("userId", userId);
-            message.put("graphName", graphName);
-            message.set("graph", node);
+    public void sendMessage(String userId, String graphName, String graph) throws JsonProcessingException {
 
 
-            messageJson = mapper.writeValueAsString(message);
 
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        ObjectMapper mapper = new ObjectMapper();
+
+        JsonNode node = mapper.readTree(graph);
+
+        ObjectNode message = mapper.createObjectNode();
+        message.put("userId", userId);
+        message.put("graphName", graphName);
+        message.set("graph", node);
+
+
+        String messageJson = mapper.writeValueAsString(message);
+
 
         sqsClient.sendMessage(SendMessageRequest.builder()
                 .queueUrl(queueUrl)

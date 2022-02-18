@@ -1,10 +1,8 @@
 package hu.listopad.socialnetworks.spring.worker.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import hu.listopad.socialnetworks.spring.data.WeightedGraph;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -28,16 +26,7 @@ public class  Louvain {
 	
 	// calculate degree of each vertex and put them in hash map
 	protected Map<Integer,Integer> calculateDegrees() {
-		/*Map<Integer,Integer> deg = new HashMap<>();
-		Map<Integer, HashMap<Integer,Integer>> map = g.getWgMap();
-		for (int from : map.keySet()) {
-			Integer d = 0;
-			for (Map.Entry<Integer, Integer> to : map.get(from).entrySet()) {
-					d = d + to.getValue();
-			}
-			deg.put(from, d);
-		}
-		return deg;*/
+
 
 		return g.getWgMap().entrySet().stream()
 				.collect(Collectors.groupingBy(Map.Entry::getKey,
@@ -120,7 +109,7 @@ public class  Louvain {
 		}
 		for (Group gr : groups) {
 			if (!gr.getNodes().isEmpty()) {        //calculate edge weights between new vertices (and self loops also)
-				HashSet<Integer> members = gr.getNodes();
+				List<Integer> members = gr.getNodes();
 				HashMap<Integer, Integer> edges = new HashMap<>();   //edge weight values are stored in a HashMap. Keys are groups ( or vertices in the new graph)
 				for (Integer i : members) {                         // calculate edge weights for all neighbouring groups
 					for (Integer j : g.getWgMap().get(i).keySet()) {

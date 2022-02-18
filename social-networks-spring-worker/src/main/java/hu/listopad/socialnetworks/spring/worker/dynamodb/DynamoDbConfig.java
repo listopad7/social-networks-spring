@@ -1,6 +1,6 @@
 package hu.listopad.socialnetworks.spring.worker.dynamodb;
 
-import hu.listopad.socialnetworks.spring.dynamo.ResultRepository;
+import hu.listopad.socialnetworks.spring.data.dynamo.ResultRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;

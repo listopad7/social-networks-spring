@@ -1,5 +1,8 @@
 package hu.listopad.socialnetworks.spring.worker.service;
 
+
+import hu.listopad.socialnetworks.spring.data.WeightedGraph;
+
 import java.util.List;
 
 /**
@@ -8,10 +11,10 @@ import java.util.List;
 public class LouvainPruneService implements CommunityDetectionService{
 
 
-	WeightedGraph g;
+
 
 	@Override
-	public List<CommunityDetectionOnePassResult> getCommunityDetectionResults() {
+	public List<CommunityDetectionOnePassResult> getCommunityDetectionResults(WeightedGraph g) {
 		return null;
 	}
 }
