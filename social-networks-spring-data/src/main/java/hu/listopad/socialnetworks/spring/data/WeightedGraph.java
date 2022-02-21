@@ -61,6 +61,10 @@ public class  WeightedGraph implements Graph {
 		return totalWeight;
 	}
 
+	public String toString(){
+		return wgMap.toString();
+	}
+
 
 
 }

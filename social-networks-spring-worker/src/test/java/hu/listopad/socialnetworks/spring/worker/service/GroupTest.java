@@ -1,32 +1,34 @@
 package hu.listopad.socialnetworks.spring.worker.service;
 
-import hu.listopad.socialnetworks.spring.data.GraphLoader;
 import hu.listopad.socialnetworks.spring.data.WeightedGraph;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Created by Noemi Czuczy on 2021. 07. 29.
- */
+
 public class GroupTest {
+
 
 	WeightedGraph g1;
 	Group gr1;
 	WeightedGraph g2;
 	Group gr2;
 
-	//TODO: change hardcded values
+
 	@BeforeEach
 	void setUp(){
-		g1 = new WeightedGraph();
-		GraphLoader.loadGraph(g1, "c:/Users/noemi/repos/social-networks-spring/data/text-files/smallstar.txt");
-		gr1 = new Group(g1, 1);
-		g2 = new WeightedGraph();
-		GraphLoader.loadGraph(g2, "c:/Users/noemi/repos/social-networks-spring/data/text-files/louvain_sample.txt");
-		gr2 = new Group(g2, 2);
-
+		try {
+			g1 = GraphLoader.loadGraph("src/test/resources/smallstar.txt");
+			gr1 = new Group(g1, 1);
+			g2 = GraphLoader.loadGraph("src/test/resources/louvain_sample.txt");
+			gr2 = new Group(g2, 2);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 

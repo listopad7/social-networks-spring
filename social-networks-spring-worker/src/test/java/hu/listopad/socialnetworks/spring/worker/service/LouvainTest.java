@@ -1,25 +1,28 @@
 package hu.listopad.socialnetworks.spring.worker.service;
 
-import hu.listopad.socialnetworks.spring.data.GraphLoader;
 import hu.listopad.socialnetworks.spring.data.WeightedGraph;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Created by Noemi Czuczy on 2021. 07. 30.
- */
+
 public class LouvainTest {
 
-	WeightedGraph g = new WeightedGraph();
+	WeightedGraph g;
 	Louvain louvain;
 
 
 	// TODO: change hardcoded value
 	@BeforeEach
 	void setUp(){
-		GraphLoader.loadGraph(g, "c:/Users/noemi/repos/social-networks-spring/data/text-files/louvain_sample.txt");
+		try {
+			g = GraphLoader.loadGraph("src/test/resources/louvain_sample.txt");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		louvain= new Louvain(g);
 	}
 

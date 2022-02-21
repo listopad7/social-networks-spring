@@ -3,12 +3,10 @@ package hu.listopad.socialnetworks.spring.web.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import hu.listopad.socialnetworks.spring.data.communitydetection.SlimCommunityDetectionResult;
 import hu.listopad.socialnetworks.spring.data.communitydetection.CommunityDetectionResult;
-import hu.listopad.socialnetworks.spring.data.communitydetection.Status;
-import hu.listopad.socialnetworks.spring.data.dynamo.ResultRepository;
 import hu.listopad.socialnetworks.spring.data.mapstruct.mappers.MapStructMapperDynamo;
-import hu.listopad.socialnetworks.spring.web.messageing.SendGraphDataMessage;
 import hu.listopad.socialnetworks.spring.web.responseData.CommunityDetectionResponse;
 import hu.listopad.socialnetworks.spring.web.responseData.CommunityDetectionToResponseMapper;
+import hu.listopad.socialnetworks.spring.web.service.CommunityDetectionServiceWeb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +18,12 @@ import java.util.NoSuchElementException;
 @RestController
 public class CommunityDetectionController {
 
-    private final ResultRepository resultRepository;
-    private final SendGraphDataMessage sendGraphDataMessage;
-    private final MapStructMapperDynamo mapStructMapperDynamo;
+    private final CommunityDetectionServiceWeb communityDetectionServiceWeb;
     private final CommunityDetectionToResponseMapper communityDetectionToResponseMapper;
 
     @Autowired
-    public CommunityDetectionController(ResultRepository resultRepository, SendGraphDataMessage sendGraphDataMessage, MapStructMapperDynamo mapStructMapperDynamo, CommunityDetectionToResponseMapper communityDetectionToResponseMapper) {
-        this.resultRepository = resultRepository;
-        this.sendGraphDataMessage = sendGraphDataMessage;
-        this.mapStructMapperDynamo = mapStructMapperDynamo;
+    public CommunityDetectionController(CommunityDetectionServiceWeb communityDetectionServiceWeb, CommunityDetectionToResponseMapper communityDetectionToResponseMapper) {
+        this.communityDetectionServiceWeb = communityDetectionServiceWeb;
         this.communityDetectionToResponseMapper = communityDetectionToResponseMapper;
     }
 
@@ -37,10 +31,7 @@ public class CommunityDetectionController {
     @GetMapping("/{userId}/graphs")
     public ResponseEntity<Iterable<SlimCommunityDetectionResult>> getGraphs(@PathVariable String userId){
 
-        Iterable<SlimCommunityDetectionResult> results= mapStructMapperDynamo.communityDetectionResultDynamoListToSlimResultList(
-                resultRepository.findByPrimaryKey(userId)
-        );
-
+        Iterable<SlimCommunityDetectionResult> results= communityDetectionServiceWeb.getGraphs(userId);
         return new ResponseEntity<>(results, HttpStatus.OK);
 
     }
@@ -51,8 +42,7 @@ public class CommunityDetectionController {
 
 
         try {
-            CommunityDetectionResult communityDetectionResult = mapStructMapperDynamo.dynamoToCommunityDetectionResult(
-                resultRepository.findByKeys(userId, graphName).get());
+            CommunityDetectionResult communityDetectionResult = communityDetectionServiceWeb.getOneResponse(userId, graphName);
 
             return new ResponseEntity<>(communityDetectionToResponseMapper.mapToResponse(communityDetectionResult), HttpStatus.OK);
 
@@ -68,15 +58,14 @@ public class CommunityDetectionController {
     @GetMapping("/sample")
     public String getSample(){
 
-        //TODO implement this
-        return "sample";
+        return communityDetectionServiceWeb.getSample();
     }
 
 
     @DeleteMapping("/{userId}/{graphName}")
     public ResponseEntity<Void> deleteGraph(@PathVariable String userId,@PathVariable String graphName){
 
-        resultRepository.deleteByKeys(userId, graphName);
+        communityDetectionServiceWeb.deleteGraph(userId, graphName);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -87,7 +76,8 @@ public class CommunityDetectionController {
 
         try {
 
-            sendGraphDataMessage.sendMessage(userId, graphName, payload);
+            return new ResponseEntity<>(communityDetectionServiceWeb.newCalculation(userId, graphName, payload),
+                    HttpStatus.ACCEPTED);
 
         } catch (JsonProcessingException e) {
 
@@ -95,15 +85,7 @@ public class CommunityDetectionController {
 
         }
 
-        CommunityDetectionResult communityDetectionResult = new CommunityDetectionResult();
-        communityDetectionResult.setUserId(userId);
-        communityDetectionResult.setGraphName(graphName);
-        communityDetectionResult.setStatus(Status.IN_PROGRESS);
 
-
-        resultRepository.save(mapStructMapperDynamo.communityDetectionResultToDynamo(communityDetectionResult));
-
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
 
