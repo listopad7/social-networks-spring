@@ -27,7 +27,6 @@ public class SendGraphDataMessageSqs implements SendGraphDataMessage {
     public void sendMessage(String userId, String graphName, String graph) throws JsonProcessingException {
 
 
-
         ObjectMapper mapper = new ObjectMapper();
 
         JsonNode node = mapper.readTree(graph);

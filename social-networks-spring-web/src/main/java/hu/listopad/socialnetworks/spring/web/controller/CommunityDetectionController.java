@@ -3,12 +3,12 @@ package hu.listopad.socialnetworks.spring.web.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import hu.listopad.socialnetworks.spring.data.communitydetection.SlimCommunityDetectionResult;
 import hu.listopad.socialnetworks.spring.data.communitydetection.CommunityDetectionResult;
-import hu.listopad.socialnetworks.spring.data.mapstruct.mappers.MapStructMapperDynamo;
 import hu.listopad.socialnetworks.spring.web.responseData.CommunityDetectionResponse;
 import hu.listopad.socialnetworks.spring.web.responseData.CommunityDetectionToResponseMapper;
 import hu.listopad.socialnetworks.spring.web.service.CommunityDetectionServiceWeb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +37,7 @@ public class CommunityDetectionController {
     }
 
 
-    @GetMapping("/{userId}/{graphName}")
+    @GetMapping(value = "/{userId}/{graphName}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CommunityDetectionResponse> getOneResult(@PathVariable String userId, @PathVariable String graphName){
 
 

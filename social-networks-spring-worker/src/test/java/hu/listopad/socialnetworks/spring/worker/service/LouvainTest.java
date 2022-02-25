@@ -15,7 +15,6 @@ public class LouvainTest {
 	Louvain louvain;
 
 
-	// TODO: change hardcoded value
 	@BeforeEach
 	void setUp(){
 		try {
