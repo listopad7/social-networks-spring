@@ -21,9 +21,21 @@ public class CommunityDetectionToResponseMapper {
 
         if (communityDetectionResult.getOriginalGraph() == null || communityDetectionResult.getGraphList() == null){
             return communityDetectionResponse;
+        }else {
+
+            communityDetectionResponse.setOriginalGraph(this.convertOriginalGraph(communityDetectionResult));
+            communityDetectionResponse.setResultList(this.convertResultGraphList(communityDetectionResult));
+
         }
 
-        // Convert original graph to json compatible graph
+        return communityDetectionResponse;
+
+
+    }
+
+    // Convert original graph to json compatible graph
+    private ResponseGraph convertOriginalGraph(CommunityDetectionResult communityDetectionResult){
+
         ResponseGraph originalGraph = new ResponseGraph();
         final List<Node> nodeListOriginal = new ArrayList<>();
 
@@ -35,10 +47,12 @@ public class CommunityDetectionToResponseMapper {
         originalGraph.setNodeList(nodeListOriginal);
         originalGraph.setEdgeList(edgeListOriginal);
         originalGraph.setModularity(communityDetectionResult.getOriginalModularity());
-        communityDetectionResponse.setOriginalGraph(originalGraph);
+        return originalGraph;
+    }
 
+    //Convert list of results to json compatible graphs
+    private List<ResponseGraph> convertResultGraphList(CommunityDetectionResult communityDetectionResult){
 
-        //Convert list of results to json compatible graphs
         List<ResponseGraph> resultList = new ArrayList<>();
 
         for (int i = 0; i< communityDetectionResult.getCommunityList().size(); i++){
@@ -48,19 +62,19 @@ public class CommunityDetectionToResponseMapper {
             final List<Edge> resultEdgeList = new ArrayList<>();
 
             communityDetectionResult.getCommunityList().get(i).forEach((a,b) -> b.forEach(c -> nodeMap.put(c,a)));
+
             nodeMap.forEach((a,b) -> resultNodeList.add(new Node(a.toString(), b.toString())));
-            communityDetectionResult.getGraphList().get(i).forEach((a,b) -> b.forEach((c,d) -> resultEdgeList.add(new Edge(a.toString(), c.toString(), d.toString()))));
+
+            communityDetectionResult.getGraphList().get(i)
+                    .forEach((a,b) -> b.forEach((c,d) -> resultEdgeList.add(new Edge(a.toString(), c.toString(), d.toString()))));
+
             ResponseGraph resultResponseGraph = new ResponseGraph();
             resultResponseGraph.setNodeList(resultNodeList);
             resultResponseGraph.setEdgeList(resultEdgeList);
             resultResponseGraph.setModularity(communityDetectionResult.getModularityList().get(i));
+
             resultList.add(resultResponseGraph);
         }
-
-        communityDetectionResponse.setResultList(resultList);
-
-        return communityDetectionResponse;
-
-
+        return resultList;
     }
 }
