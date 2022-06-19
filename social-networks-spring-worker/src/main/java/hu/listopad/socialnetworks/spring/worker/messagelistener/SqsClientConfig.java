@@ -11,7 +11,7 @@ import java.net.URI;
 @Configuration
 public class SqsClientConfig {
 
-    @Value("${localstack.endpoint}")
+    @Value("${sqs.endpoint}")
     private String endpointUrl;
 
     @Bean
