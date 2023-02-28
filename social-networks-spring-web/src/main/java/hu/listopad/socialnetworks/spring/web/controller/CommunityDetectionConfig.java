@@ -9,6 +9,7 @@ public class CommunityDetectionConfig {
 
     @Bean
     public CommunityDetectionResult communityDetectionResult(){
+
         return new CommunityDetectionResult();
     }
 }
